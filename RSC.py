@@ -48,10 +48,11 @@ class Client:
         if self.sor:
             while True:
                 self.sock.send(bytes(input('Command: '), 'utf-8'))
-                print('Successfully executed')
+                print('Successfully executed\n')
 
     def __init__(self, address):
         self.sock.connect((address, 10000))
+        print("The sender should connect first!!")
         if input("Are you a sender (y/n) : ") == 'y':
             if input("What is the password: ") == self.pw:
                 self.sor = True
@@ -68,6 +69,10 @@ class Client:
         i_thread.start()
 
         if not self.sor:
+            if sys.platform == 'linux':
+                self.sock.send(bytes('The receiver has a linux-based system\n', 'utf-8'))
+            elif sys.platform == 'win32' or 'cygwin':
+                self.sock.send(bytes('The receiver has a windows system\n', 'utf-8'))
             print("Connected as receiver")
 
         while True:
@@ -76,6 +81,17 @@ class Client:
                 break
             if not self.sor:
                 os.system(str(data, 'utf-8'))
+            if self.sor:
+                if sys.platform == 'linux':
+                    os.system('clear')
+                elif sys.platform == 'win32' or 'cygwin':
+                    os.system('cls')
+                if data != '':
+                    print(str(data, 'utf-8'))
+                    self.send_bytes()
+                else:
+                    print("We couldn't get the receiver's operating system")
+                    self.send_bytes()
 
 
 if len(sys.argv) > 1:
